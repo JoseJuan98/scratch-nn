@@ -2,7 +2,7 @@
 
 Neural Networks from scratch, only using vectorized operations with [Numpy](https://numpy.org/)
 
-The idea behind this repository is to develop a simple Python library to work with Deep Neural Networks to understand
+The idea behind this repository is to develop a Production-ready Python library to work with simple Deep Neural Networks to understand
 further how they work and make them more efficient.
 
 ### Things to try

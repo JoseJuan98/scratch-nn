@@ -1,4 +1,4 @@
-.PHONY: clean data lint requirements environment clean_environment
+.PHONY: requirements data lint environment clean_environment clean test dev_requirements
 
 #################################################################################
 # GLOBALS                                                                       #
@@ -20,14 +20,14 @@ PYTHON_VERSION = 3
 # to use args
 # $(call args, <default_value>)
 
-## a
-activate:
-	source ./venv/bin/activate
-
 ## Install Python Dependencies
 requirements:
 	$(PYTHON_INTERPRETER) -m pip install --no-cache-dir -U pip setuptools wheel build
 	$(PYTHON_INTERPRETER) -m pip install --no-cache-dir -U -r requirements.txt
+
+## Install dependencies for development
+dev_requirements:
+	pip install -e .[testing]
 
 ## Make Dataset
 data: requirements
@@ -35,7 +35,12 @@ data: requirements
 
 ## Lint using flake8
 lint:
-	flake8 src test
+	flake8 src test; \
+	mypy src test
+
+## Test using pytest
+test:
+	pytest -v
 
 ## Create python virtual environment
 environment:
