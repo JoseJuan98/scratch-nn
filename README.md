@@ -9,3 +9,8 @@ further how they work and make them more efficient.
 
 - [ ] Changing numpy for an array GPU-accelerated computing library like CuPy
 - [ ] Creating a little library
+
+
+## TODO
+
+- Change datasets location, properly setup a path to work with data
