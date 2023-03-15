@@ -10,6 +10,8 @@
 #
 """Deep Neural Network"""
 
+from typing import Any
+
 import numpy
 import matplotlib.pyplot as pyplot
 
@@ -35,8 +37,8 @@ class DeepNN(NeuralNet):
         self.learning_rate = None
 
     def train(self,
-              X: numpy.ndarray,
-              Y: numpy.ndarray,
+              X: numpy.ndarray[Any, numpy.dtype[Any]],
+              Y: numpy.ndarray[Any, numpy.dtype[Any]],
               learning_rate: float = 0.0075,
               num_iterations: int = 3000,
               print_cost=False,
@@ -107,20 +109,22 @@ class DeepNN(NeuralNet):
 
         Returns:
             parameters: python dictionary containing your parameters "W1", "b1", ..., "WL", "bL":
-                        Wl: weight matrix of shape (layer_dims[l], layer_dims[l-1])
-                        bl: bias vector of shape (layer_dims[l], 1)
+                        Wl: weight matrix of shape (layer_dims[layer_index], layer_dims[layer_index-1])
+                        bl: bias vector of shape (layer_dims[layer_index], 1)
         """
 
         numpy.random.seed(3)
         parameters = {}
-        L = len(layer_dims)  # number of layers in the network
+        n_layers = len(layer_dims)  # number of layers in the network
 
-        for l in range(1, L):
-            parameters['W' + str(l)] = numpy.random.randn(layer_dims[l], layer_dims[l - 1]) * 0.01
-            parameters['b' + str(l)] = numpy.zeros((layer_dims[l], 1))
+        for layer_index in range(1, n_layers):
+            parameters['W' + str(layer_index)] = numpy.random.randn(layer_dims[layer_index],
+                                                                    layer_dims[layer_index - 1]) * 0.01
+            parameters['b' + str(layer_index)] = numpy.zeros((layer_dims[layer_index], 1))
 
-            assert (parameters['W' + str(l)].shape == (layer_dims[l], layer_dims[l - 1]))
-            assert (parameters['b' + str(l)].shape == (layer_dims[l], 1))
+            assert (parameters['W' + str(layer_index)].shape == (layer_dims[layer_index],
+                                                                 layer_dims[layer_index - 1]))
+            assert (parameters['b' + str(layer_index)].shape == (layer_dims[layer_index], 1))
 
         return parameters
 
@@ -161,7 +165,7 @@ class DeepNN(NeuralNet):
                      stored for computing the backward pass efficiently
         """
         activation_cache = 0
-        A = numpy.array()
+        A = numpy.array([])
         Z, linear_cache = self.linear_forward(A_prev, W, b)
         if activation == "sigmoid":
             # Inputs: "A_prev, W, b". Outputs: "A, activation_cache".
@@ -178,7 +182,7 @@ class DeepNN(NeuralNet):
 
     def forward_propagation(self, X, parameters):
         """
-        Implement forward propagation for the [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID computation
+        Implement forward propagation for the [LINEAR->RELU]*(n_layers-1)->LINEAR->SIGMOID computation
 
         Arguments:
             X: data, numpy array of shape (input size, number of examples)
@@ -187,28 +191,34 @@ class DeepNN(NeuralNet):
         Returns:
             AL: last post-activation value
             caches: list of caches containing:
-                    every cache of linear_activation_forward() (there are L-1 of them, indexed from 0 to L-1)
+                    every cache of linear_activation_forward() (there are n_layers-1 of them,
+                    indexed from 0 to n_layers-1)
         """
 
         caches = []
         A = X
-        L = len(parameters) // 2  # number of layers in the neural network
+        n_layers = len(parameters) // 2  # number of layers in the neural network
 
-        # Implement [LINEAR -> RELU]*(L-1). Add "cache" to the "caches" list.
-        for l in range(1, L):
+        # Implement [LINEAR -> RELU]*(n_layers-1). Add "cache" to the "caches" list.
+        for layer_index in range(1, n_layers):
             A_prev = A
-            A, cache = self.linear_activation_forward(A_prev, parameters['W' + str(l)], parameters['b' + str(l)], 'relu')
+            A, cache = self.linear_activation_forward(A_prev,
+                                                      parameters['W' + str(layer_index)],
+                                                      parameters['b' + str(layer_index)],
+                                                      'relu')
             caches.append(cache)
 
         # Implement LINEAR -> SIGMOID. Add "cache" to the "caches" list.
-        AL, cache = self.linear_activation_forward(A, parameters['W' + str(L)], parameters['b' + str(L)], 'sigmoid')
+        AL, cache = self.linear_activation_forward(A,
+                                                   parameters['W' + str(n_layers)],
+                                                   parameters['b' + str(n_layers)], 'sigmoid')
         caches.append(cache)
 
         assert (AL.shape == (1, X.shape[1]))
 
         return AL, caches
 
-    def compute_cost(self, AL, Y) -> numpy.ndarray:
+    def compute_cost(self, AL, Y) -> float:
         """
         Implement the cost function.
 
@@ -229,7 +239,7 @@ class DeepNN(NeuralNet):
         cost = numpy.squeeze(cost)  # To make sure your cost's shape is what we expect (e.g. this turns [[17]] into 17).
         assert (cost.shape == ())
 
-        return cost
+        return float(cost)
 
     @staticmethod
     def linear_backward(dZ, cache):
@@ -241,7 +251,8 @@ class DeepNN(NeuralNet):
             cache: tuple of values (A_prev, W, b) coming from the forward propagation in the current layer
 
         Returns:
-            dA_prev: Gradient of the cost with respect to the activation (of the previous layer l-1), same shape as A_prev
+            dA_prev: Gradient of the cost with respect to the activation (of the previous layer l-1),
+                     same shape as A_prev
             dW: Gradient of the cost with respect to W (current layer l), same shape as W
             db: Gradient of the cost with respect to b (current layer l), same shape as b
         """
@@ -264,18 +275,20 @@ class DeepNN(NeuralNet):
 
         Arguments:
             dA: post-activation gradient for current layer l
-            cache: tuple of values (linear_cache, activation_cache) we store for computing backward propagation efficiently
+            cache: tuple of values (linear_cache, activation_cache) we store for computing backward propagation
+                   efficiently
             activation: the activation to be used in this layer, stored as a text string: "sigmoid" or "relu"
 
         Returns:
-            dA_prev: Gradient of the cost with respect to the activation (of the previous layer l-1), same shape as A_prev
+            dA_prev: Gradient of the cost with respect to the activation (of the previous layer l-1), same
+                     shape as A_prev
             dW: Gradient of the cost with respect to W (current layer l), same shape as W
             db: Gradient of the cost with respect to b (current layer l), same shape as b
         """
         linear_cache, activation_cache = cache
 
         # A_prev, W, b = linear_cache
-        dZ = numpy.array()
+        dZ = numpy.array([])
         if activation == "relu":
             dZ = relu_backward(dA, activation_cache)
 
@@ -288,24 +301,25 @@ class DeepNN(NeuralNet):
 
     def backward_propagation(self, AL, Y, caches):
         """
-        Implement the backward propagation for the [LINEAR->RELU] * (L-1) -> LINEAR -> SIGMOID group
+        Implement the backward propagation for the [LINEAR->RELU] * (n_layers-1) -> LINEAR -> SIGMOID group
 
         Arguments:
             AL: probability vector, output of the forward propagation (L_model_forward())
             Y: true "label" vector (containing 0 if non-cat, 1 if cat)
             caches: list of caches containing:
-                    every cache of linear_activation_forward() with "relu" (it's caches[l], for l in range(L-1) i.e l = 0...L-2)
-                    the cache of linear_activation_forward() with "sigmoid" (it's caches[L-1])
+                    every cache of linear_activation_forward() with "relu" (it's caches[layer_index],
+                    for layer_index in range(n_layers-1) i.e layer_index = 0...n_layers-2)
+                    the cache of linear_activation_forward() with "sigmoid" (it's caches[n_layers-1])
 
         Returns:
             grads: A dictionary with the gradients
-                     grads["dA" + str(l)] = ...
-                     grads["dW" + str(l)] = ...
-                     grads["db" + str(l)] = ...
+                     grads["dA" + str(layer_index)] = ...
+                     grads["dW" + str(layer_index)] = ...
+                     grads["db" + str(layer_index)] = ...
         """
         grads = {}
-        L = len(caches)  # the number of layers
-        m = AL.shape[1]
+        n_layers = len(caches)  # the number of layers
+        # m = AL.shape[1]
         Y = Y.reshape(AL.shape)  # after this line, Y is the same shape as AL
 
         # Initializing the backpropagation
@@ -313,22 +327,29 @@ class DeepNN(NeuralNet):
 
         # linear_cache, activation_cache = caches
         print(caches)
-        # Lth layer (SIGMOID -> LINEAR) gradients. Inputs: "dAL, current_cache". Outputs: "grads["dAL-1"], grads["dWL"], grads["dbL"]
-        current_cache = caches[L - 1]
+        # Lth layer (SIGMOID -> LINEAR) gradients.
+        #           Inputs: "dAL, current_cache".
+        #           Outputs: "grads["dAL-1"], grads["dWL"], grads["dbL"]
+        current_cache = caches[n_layers - 1]
         print('\n ---', current_cache)
-        grads["dA" + str(L - 1)], grads["dW" + str(L)], grads["db" + str(L)] = self.linear_activation_backward(dAL,
-                                                                                                          current_cache,
-                                                                                                          'sigmoid')
+        (grads["dA" + str(n_layers - 1)],
+         grads["dW" + str(n_layers)],
+         grads["db" + str(n_layers)]) = self.linear_activation_backward(dAL, current_cache, 'sigmoid')
         print('\n', grads)
-        # Loop from l=L-2 to l=0
-        for l in reversed(range(L - 1)):
+        # Loop from layer_index=n_layers-2 to layer_index=0
+        for layer_index in reversed(range(n_layers - 1)):
             # lth layer: (RELU -> LINEAR) gradients.
-            # Inputs: "grads["dA" + str(l + 1)], current_cache". Outputs: "grads["dA" + str(l)] , grads["dW" + str(l + 1)] , grads["db" + str(l + 1)]
-            current_cache = caches[l]
-            dA_prev_temp, dW_temp, db_temp = self.linear_activation_backward(grads["dA" + str(l + 1)], current_cache, 'relu')
-            grads["dA" + str(l)] = dA_prev_temp
-            grads["dW" + str(l + 1)] = dW_temp
-            grads["db" + str(l + 1)] = db_temp
+            # Inputs: grads["dA" + str(layer_index + 1)], current_cache.
+            # Outputs:
+            #   grads["dA" + str(layer_index)] ,
+            #   grads["dW" + str(layer_index + 1)] ,
+            #   grads["db" + str(layer_index + 1)]
+            current_cache = caches[layer_index]
+            dA_prev_temp, dW_temp, db_temp = self.linear_activation_backward(grads["dA" + str(layer_index + 1)],
+                                                                             current_cache, 'relu')
+            grads["dA" + str(layer_index)] = dA_prev_temp
+            grads["dW" + str(layer_index + 1)] = dW_temp
+            grads["db" + str(layer_index + 1)] = db_temp
 
         return grads
 
@@ -342,17 +363,23 @@ class DeepNN(NeuralNet):
 
         Returns:
             parameters: python dictionary containing your updated parameters
-                      parameters["W" + str(l)] = ...
-                      parameters["b" + str(l)] = ...
+                      parameters["W" + str(layer_index)] = ...
+                      parameters["b" + str(layer_index)] = ...
         """
 
-        L = len(parameters) // 2  # number of layers in the neural network
+        n_layers = len(parameters) // 2  # number of layers in the neural network
 
         # Update rule for each parameter. Use a for loop.
-        for l in range(L):
-            parameters["W" + str(l + 1)] = numpy.subtract(parameters['W' + str(l + 1)],
-                                                          numpy.multiply(learning_rate, grads['dW' + str(l + 1)]))
-            parameters["b" + str(l + 1)] = numpy.subtract(parameters['b' + str(l + 1)],
-                                                          numpy.multiply(learning_rate, grads['db' + str(l + 1)]))
+        for layer_index in range(n_layers):
+            parameters["W" + str(layer_index + 1)] = numpy.subtract(parameters['W' + str(layer_index + 1)],
+                                                                    numpy.multiply(learning_rate,
+                                                                                   grads['dW' + str(layer_index + 1)]
+                                                                                   )
+                                                                    )
+            parameters["b" + str(layer_index + 1)] = numpy.subtract(parameters['b' + str(layer_index + 1)],
+                                                                    numpy.multiply(learning_rate,
+                                                                                   grads['db' + str(layer_index + 1)]
+                                                                                   )
+                                                                    )
 
         return parameters

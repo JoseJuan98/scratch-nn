@@ -12,6 +12,8 @@
 
 from unittest import TestCase
 
+import numpy
+
 from deepnn.dnn_utils import sigmoid
 
 
@@ -21,4 +23,19 @@ class TestDNNUtils(TestCase):
     """
 
     def test_sigmoid(self):
-        self.assertTrue(True)
+        self.assertEqual(sigmoid(Z=3), (0.9525741268224334, 3))
+
+    def test_sigmoid_raise_type_error(self):
+        with self.assertRaises(TypeError):
+            sigmoid([1, 2, 3])
+
+    def test_sigmoid_numpy_array(self):
+        x = numpy.array([1, 2, 3])
+        A, cache = sigmoid(x)
+        self.assertEqual(A.shape, (3,))
+        self.assertTrue(numpy.array_equal(A, numpy.array([0.7310585786300049,
+                                                          0.8807970779778825,
+                                                          0.9525741268224334]
+                                                         )
+                                          )
+                        )

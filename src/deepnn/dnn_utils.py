@@ -9,11 +9,12 @@
 # __________________________________________
 #
 """ Utilities for working with Deep Neural Network """
+from typing import Any
 
 import numpy
 
 
-def sigmoid(Z):
+def sigmoid(Z: numpy.ndarray[Any, numpy.dtype[Any]]):
     """
     Sigmoid activation function.
 

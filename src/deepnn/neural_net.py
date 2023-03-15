@@ -11,7 +11,9 @@
 """Base Neural Network """
 
 from abc import ABC, abstractmethod
-from numpy import ndarray
+from typing import Any
+
+import numpy
 
 
 class NeuralNet(ABC):
@@ -42,8 +44,8 @@ class NeuralNet(ABC):
 
     @abstractmethod
     def train(self,
-              X: ndarray,
-              Y: ndarray,
+              X: numpy.ndarray[Any, numpy.dtype[Any]],
+              Y: numpy.ndarray[Any, numpy.dtype[Any]],
               learning_rate: float = 0.0075,
               num_iterations: int = 3000):
         """
@@ -60,7 +62,7 @@ class NeuralNet(ABC):
         """
 
     @abstractmethod
-    def predict(self) -> ndarray:
+    def predict(self) -> float:
         """
         Performs the prediction with the trained neurons
 
