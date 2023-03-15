@@ -6,7 +6,7 @@
 
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME = deepnn
-PYTHON_INTERPRETER = python3
+PYTHON_INTERPRETER = python
 PACKAGE_MANAGER = pip
 PYTHON_VERSION = 3
 
