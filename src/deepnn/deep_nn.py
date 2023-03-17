@@ -34,6 +34,8 @@ class DeepNN(NeuralNet):
         self.seed = numpy.random.seed(1)
         self.costs = []  # keep track of cost
         self.parameters = self.initialize_parameters_deep(layers_dims)  # Parameters initialization.
+        # TODO
+        # slef.activations = activations # Or convert layers_dims in a List[(activation, n_neurons)]
         self.learning_rate = None
 
     def train(self,
