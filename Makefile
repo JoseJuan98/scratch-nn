@@ -1,8 +1,6 @@
 .PHONY: requirements data lint environment clean_environment clean test dev_requirements
 
-#################################################################################
-# GLOBALS                                                                       #
-#################################################################################
+# _________________________ GLOBALS _________________________
 
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME = deepnn
@@ -10,9 +8,7 @@ PYTHON_INTERPRETER = python
 PACKAGE_MANAGER = pip
 PYTHON_VERSION = 3
 
-#################################################################################
-# COMMANDS                                                                      #
-#################################################################################
+# _________________________ COMMANDS _________________________
 
 # In case a command need args
 #args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
@@ -20,27 +16,22 @@ PYTHON_VERSION = 3
 # to use args
 # $(call args, <default_value>)
 
-## Install Python Dependencies
+## Install Python Dependencies for development
 requirements:
 	$(PYTHON_INTERPRETER) -m pip install --no-cache-dir -U pip setuptools wheel build
-	$(PYTHON_INTERPRETER) -m pip install --no-cache-dir -U -r requirements.txt
-
-## Install dependencies for development
-dev_requirements:
-	pip install -e .[testing]
-
-## Make Dataset
-data: requirements
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
+	$(PYTHON_INTERPRETER) -m pip install --no-cache-dir -U -e .[build,test,dev]
 
 ## Lint using flake8
 lint:
-	flake8 src test; \
-	mypy src test
+	python -m tox -p -e flake8,mypy
 
 ## Test using pytest
 test:
-	pytest -v
+	python -m pytest test
+
+## Test using pytest and coverage
+cov-test:
+	python -m tox -e py310
 
 ## Create python virtual environment
 environment:
@@ -53,7 +44,7 @@ ifeq ($(PACKAGE_MANAGER),"conda")
 	@echo ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
 else
 	@echo Creating venv venv;
-	$(PYTHON_INTERPRETER) -m pip install virtualenv;
+	$(PYTHON_INTERPRETER) -m pip install -U pip virtualenv;
 	$(PYTHON_INTERPRETER) -m virtualenv venv;
 endif
 endif
@@ -71,16 +62,10 @@ endif
 clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
-
-#################################################################################
-# PROJECT RULES                                                                 #
-#################################################################################
+	python -m tox -e clean
 
 
-
-#################################################################################
-# Self Documenting Commands                                                     #
-#################################################################################
+# _________________________ Self Documenting Commands _________________________
 
 .DEFAULT_GOAL := help
 

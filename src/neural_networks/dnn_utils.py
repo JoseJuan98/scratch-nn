@@ -16,8 +16,7 @@ import numpy
 
 def sigmoid(Z: Union[numpy.ndarray[Any, numpy.dtype[Any]], int, float]
             ) -> Tuple[Union[numpy.ndarray[Any, numpy.dtype[Any]], int, float],
-                       Union[numpy.ndarray[Any, numpy.dtype[Any]], int, float]
-                      ]:
+                       Union[numpy.ndarray[Any, numpy.dtype[Any]], int, float]]:
     """
     Sigmoid activation function.
 

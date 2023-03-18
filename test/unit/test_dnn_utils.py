@@ -27,7 +27,7 @@ class TestDNNUtils(TestCase):
 
     def test_sigmoid_raise_type_error(self):
         with self.assertRaises(TypeError):
-            sigmoid([1, 2, 3])
+            sigmoid([1, 2, 3])  # type: ignore [arg-type]
 
     def test_sigmoid_numpy_array(self):
         x = numpy.array([1, 2, 3])
