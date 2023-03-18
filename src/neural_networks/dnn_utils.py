@@ -9,26 +9,26 @@
 # __________________________________________
 #
 """ Utilities for working with Deep Neural Network """
-from typing import Any
+from typing import Any, Union, Tuple
 
 import numpy
 
 
-def sigmoid(Z: numpy.ndarray[Any, numpy.dtype[Any]]):
+def sigmoid(Z: Union[numpy.ndarray[Any, numpy.dtype[Any]], int, float]
+            ) -> Tuple[Union[numpy.ndarray[Any, numpy.dtype[Any]], int, float],
+                       Union[numpy.ndarray[Any, numpy.dtype[Any]], int, float]
+                      ]:
     """
     Sigmoid activation function.
 
     Args:
-        Z: numpy array of any shape
+        Z (numpy.array, int, float): input of the sigmoid function. Scalar or vector.
 
     Returns:
-        A: result of the function sigmoid(z), same shape as Z
-        cache: returns Z to later be used on backpropagation
+        (numpy.array, int, float): result of the function sigmoid(z), same shape as Z
+        (numpy.array, int, float): returns Z to later be used on backpropagation
     """
-    A = 1 / (1 + numpy.exp(-Z))
-    cache = Z
-
-    return A, cache
+    return 1 / (1 + numpy.exp(-Z)), Z
 
 
 def relu(Z):
@@ -45,7 +45,7 @@ def relu(Z):
 
     A = numpy.maximum(0, Z)
 
-    assert (A.shape == Z.shape)
+    assert (A.shape == Z.shape), "Post-activation parameter doesn't have same shape as Z"
 
     cache = Z
     return A, cache
@@ -69,7 +69,7 @@ def relu_backward(dA, cache):
     # When z <= 0, you should set dz to 0 as well.
     dZ[Z <= 0] = 0
 
-    assert (dZ.shape == Z.shape)
+    assert (dZ.shape == Z.shape), "dZ, Gradient descent of Z, doesn't have same shape as Z"
 
     return dZ
 

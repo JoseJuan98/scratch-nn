@@ -16,7 +16,7 @@ import numpy
 import matplotlib.pyplot as pyplot
 
 from dnn_utils import sigmoid, sigmoid_backward, relu, relu_backward
-from neural_net import NeuralNet
+from neural_networks.neural_net import NeuralNet
 
 
 class DeepNN(NeuralNet):

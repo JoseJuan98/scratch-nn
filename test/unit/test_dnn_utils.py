@@ -14,7 +14,7 @@ from unittest import TestCase
 
 import numpy
 
-from deepnn.dnn_utils import sigmoid
+from neural_networks.dnn_utils import sigmoid
 
 
 class TestDNNUtils(TestCase):
