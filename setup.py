@@ -3,6 +3,5 @@ from setuptools import setup, find_packages
 
 if __name__ == '__main__':
     setup(
-        packages=find_packages(where='src', include=["*"]),
-        package_dir={"neural_networks": "src/neural_networks"}
+        packages=find_packages(where='src', include=["*"])
     )
