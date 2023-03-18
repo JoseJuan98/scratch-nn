@@ -1,17 +1,3 @@
-# Neural Network From Scratch 
-
-Neural Networks from scratch, only using vectorized operations with [Numpy](https://numpy.org/)
-
-The idea behind this repository is to develop a Production-ready Python library to work with simple Deep Neural Networks to understand
-further how they work and make them more efficient.
-
-### Things to try
-
-- [ ] Changing numpy for an array GPU-accelerated computing library like CuPy
-- [ ] Develop another architectures of NNs
-
-
-
 # Neural Network From Scratch
 
 This repository contains a Python library for building simple Deep Neural Networks from scratch, using only vectorized operations with [NumPy](https://numpy.org/). 
