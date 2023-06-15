@@ -38,7 +38,7 @@ nn = DeepNN(layers_dims=[input_size, hidden_size, output_size], activations=["si
 
 This library is a work in progress, and there are several areas where you can contribute and improve its functionality. Here are some ideas:
 
-- [ ]   **Optimizing performance:** While the library is currently optimized for efficiency using NumPy, you can try using a GPU-accelerated computing library like CuPy to further improve its performance.
+- [ ]   **Optimizing performance:** While the library is currently optimized for efficiency using NumPy, you can try using a GPU-accelerated computing library like CuPy and CuPyx  to further improve its performance.
 - [ ]   **Developing new architectures of NNs:** The current library supports only a simple feedforward neural network architecture, but you can explore other architectures, such as convolutional neural networks or recurrent neural networks, and implement them using the existing framework.
 - [ ]   **Adding more evaluation metrics:** The library currently supports a limited set of evaluation metrics. You can add more metrics, such as precision and recall, to provide a more comprehensive view of model performance.
 
