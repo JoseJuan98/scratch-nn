@@ -1,0 +1,39 @@
+# -*- utf-8 -*-
+"""Artificial Neural Network functions.
+
+This module contains functions which are NumPy implementation of equations or formulas used to work with Artificial
+Neural Networks. For example, the CrossEntropyLoss function.
+"""
+from typing import Union
+
+import numpy
+
+
+def relu(x: numpy.ndarray) -> numpy.ndarray:
+    """ReLU activation function."""
+    return numpy.maximum(0, x)
+
+
+def relu_derivative(x: numpy.ndarray) -> numpy.ndarray:
+    """Derivative of the ReLU activation function."""
+    return (x > 0).astype(x.dtype)
+
+
+def softmax(x: numpy.ndarray) -> numpy.ndarray:
+    """Softmax activation function."""
+    exp_x = numpy.exp(x - numpy.max(x, axis=1, keepdims=True))
+    return exp_x / numpy.sum(exp_x, axis=1, keepdims=True)
+
+
+def cross_entropy_loss(y_pred: numpy.ndarray, y_true: numpy.ndarray) -> Union[numpy.ndarray, float]:
+    """Cross Entropy Loss function."""
+    return -numpy.sum(y_true * numpy.log(y_pred)) / y_true.shape[0]
+
+
+def cross_entropy_loss_derivative(y_pred: numpy.ndarray, y_true: numpy.ndarray) -> numpy.ndarray:
+    """Derivative of the Cross Entropy Loss function with respect softmax.
+
+    Equation:
+        $$\frac{\partial L}{\partial \hat{y}} = \hat{y} - y$$
+    """
+    return y_pred - y_true
